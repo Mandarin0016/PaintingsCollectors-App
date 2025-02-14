@@ -42,18 +42,23 @@ public class PaintingsController {
     }
 
     @PostMapping
-    public String createNewPainting(@Valid CreatePaintingRequest createPaintingRequest, BindingResult bindingResult, HttpSession session) {
-
-        if (bindingResult.hasErrors()) {
-            return "new-painting";
-        }
+    public ModelAndView createNewPainting(@Valid CreatePaintingRequest createPaintingRequest, BindingResult bindingResult, HttpSession session) {
 
         UUID userId = (UUID) session.getAttribute("user_id");
         User user = userService.getById(userId);
 
+        if (bindingResult.hasErrors()) {
+
+            ModelAndView modelAndView = new ModelAndView();
+            modelAndView.setViewName("new-painting");
+            modelAndView.addObject("user", user);
+            return modelAndView;
+        }
+
+
         paintingService.createNewPainting(createPaintingRequest, user);
 
-        return "redirect:/home";
+        return new ModelAndView("redirect:/home");
     }
 
     @DeleteMapping("/{id}")
